@@ -1,0 +1,108 @@
+/* General body styling */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  height: 100vh; /* Ensure the body fills the viewport height */
+}
+
+/* Header styling */
+.header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  padding: 10px 20px; /* Add padding for better spacing */
+  box-sizing: border-box; /* Include padding in dimensions */
+  align-items: center; /* Align buttons vertically */
+}
+
+.top-btn {
+  color: #007bff;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1rem; /* Adjust font size for better scaling */
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+  opacity: 0.7; /* Slight transparency */
+  transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.top-btn:hover {
+  opacity: 1; /* Fully opaque on hover */
+}
+
+
+/* Container styling */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw; /* Full width of the viewport */
+  height: calc(100vh - 60px); /* Subtract header height (adjust if necessary) */
+  padding: 20px;
+  box-sizing: border-box; /* Include padding within width/height */
+  overflow-y: auto; /* Enable scrolling if content overflows */
+}
+
+/* Title styling */
+.title {
+  color: #007bff;
+  margin-bottom: 20px;
+  font-size: 24px;
+  text-align: center;
+}
+
+/* Grid styling for analysis cards */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive layout */
+  gap: 20px;
+  width: 100%; /* Full container width */
+  max-width: 30rem; /* Optional: Limit grid width */
+  margin: 0 auto; /* Center the grid */
+}
+
+@media (max-width: 768px) {
+  .history-grid {
+    grid-template-columns: 1fr; /* Single column on small screens */
+  }
+}
+/* Individual analysis card styling */
+.analysis-card {
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex; /* Align content side by side */
+  justify-content: space-between; /* Space between elements */
+  align-items: center; /* Center vertically */
+  transition: transform 0.3s;
+}
+
+.analysis-card:hover {
+  transform: translateY(-5px); /* Hover effect */
+}
+
+/* Styling for medicine name */
+.medicine-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Styling for medicine count */
+.medicine-count {
+  font-size: 16px;
+  color: #555;
+  margin-left: 20px; /* Add space between name and count */
+}
+
+/* Styling for no data message */
+.no-data {
+  font-size: 18px;
+  color: #555;
+  text-align: center;
+}
