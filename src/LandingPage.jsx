@@ -18,10 +18,10 @@ import "./LandingPage.css";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [medicines, setMedicines] = useState([]);
   const [doctorName, setDoctorName] = useState(null);
+  const [disease, setDisease] = useState(null);
+  const [medicines, setMedicines] = useState([]);
   const [tests, setTests] = useState([]);
-  const [diseases, setDiseases] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -43,10 +43,10 @@ const LandingPage = () => {
   }, []);
 
   const formReset = () => {
-    setMedicines([]);
-    setDiseases([]);
-    setTests([]);
     setDoctorName(null);
+    setDisease(null);
+    setMedicines([]);
+    setTests([]);
     setFile(null);
     setExtractionAttempted(false);
   };
@@ -75,16 +75,11 @@ const LandingPage = () => {
       }
 
       const data = await response.json();
-      setMedicines(data.medicines || []);
       setDoctorName(data.doctorName || "Not Found");
-      setTests(
-        data.tests && data.tests.length > 0 ? data.tests : ["Not Found"]
-      );
-      setDiseases(
-        data.diseases && data.diseases.length > 0
-          ? data.diseases
-          : ["Not Found"]
-      );
+      setDisease(data.disease || "Not Found");
+      setMedicines(data.medicines || ["Not Found"]);
+      setTests(data.tests || ["Not Found"]);
+
       setExtractionAttempted(true);
     } catch (err) {
       setError(err.message);
@@ -94,9 +89,9 @@ const LandingPage = () => {
   };
 
   const saveData = async () => {
-    if (medicines.length === 0 && tests.length === 0 && diseases.length === 0) {
+    if (medicines.length === 0 && tests.length === 0 && disease.length === 0) {
       setError(
-        "Doctor's name, medicines, tests, or diseases must be filled in."
+        "Doctor's name, medicines, tests, or disease must be filled in."
       );
       return;
     }
@@ -104,9 +99,9 @@ const LandingPage = () => {
     try {
       await addDoc(collection(db, userId), {
         doctorName,
+        disease,
         medicines,
         tests,
-        diseases,
         date: new Date(),
       });
 
@@ -205,14 +200,17 @@ const LandingPage = () => {
           </div>
         )}
 
-        {diseases.length > 0 && (
+        {disease && (
           <div className="message message-text">
-            <h3 className="title">Diagnosed Diseases:</h3>
-            {diseases.map((disease, index) => (
-              <div key={index} className="editable-div">
-                {disease}
-              </div>
-            ))}
+            <h3 className="title">Disease Name:</h3>
+            <p
+              contentEditable="true"
+              spellCheck="false"
+              suppressContentEditableWarning={true}
+              onBlur={(e) => setDisease(e.target.textContent)}
+            >
+              {disease}
+            </p>
           </div>
         )}
 
