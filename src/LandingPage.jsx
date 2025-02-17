@@ -44,6 +44,8 @@ const LandingPage = () => {
 
   const formReset = () => {
     setMedicines([]);
+    setDiseases([]);
+    setTests([]);
     setDoctorName(null);
     setFile(null);
     setExtractionAttempted(false);
@@ -75,8 +77,14 @@ const LandingPage = () => {
       const data = await response.json();
       setMedicines(data.medicines || []);
       setDoctorName(data.doctorName || "Not Found");
-      setTests(data.tests || []);
-      setDiseases(data.diseases || []);
+      setTests(
+        data.tests && data.tests.length > 0 ? data.tests : ["Not Found"]
+      );
+      setDiseases(
+        data.diseases && data.diseases.length > 0
+          ? data.diseases
+          : ["Not Found"]
+      );
       setExtractionAttempted(true);
     } catch (err) {
       setError(err.message);
