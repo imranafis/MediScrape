@@ -20,10 +20,12 @@ const app = express();
 const port = 5000;
 
 // Enable CORS for cross-origin requests
-app.use(cors({
-  origin: 'https://imranafis.github.io', // Replace with your actual frontend URL
-  methods: ['POST'],
-}));
+app.use(
+  cors({
+    origin: "https://imranafis.github.io", // Replace with your actual frontend URL
+    methods: ["POST"],
+  })
+);
 
 // Multer setup for file uploads
 const upload = multer({ dest: "uploads/" });
@@ -70,22 +72,28 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
 
     const promptMsg = `You are an intelligent assistant specializing in extracting information from handwritten prescription images. Your task is to:
 
-                    1. Extract Doctor's Name: Identify and extract the name of the doctor if it is present and clearly mentioned on the prescription.
-                    2. Extract Medicine Names: Precisely extract text from the uploaded handwritten prescription image, focusing only on medicine names.
-                    3. Verify Against Medicine Databases: Cross-check each extracted name against a comprehensive and up-to-date medicine database to ensure accuracy. If possible search it on Google and see the results, if Google suggest result then return the result.
-                    4. Correct Misspellings and Misreads: Identify and correct any errors caused by handwriting issues (e.g., interpreting "Alatocol" as "Alatrol" if "Alatrol" is a verified medicine name).
-                    5. Avoid Fabrication: Do not infer or fabricate any names or information not explicitly visible in the prescription.
-                    6. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). Ensure the format is <Medicine Name> <Number> mg. Validate the dosage for correctness, and if it is invalid, return only the medicine name without the dosage.
-                    7. Output Format: Provide the verified information in the following format:
-
-                        Doctor: [Doctor's Name]
-                        Medicines:
-                        1. [<Medicine Name> <Number> mg]
-                        2. [<Medicine Name>]
-
-                    Guidelines:
-                      - Ensure accuracy by carefully checking for discrepancies in spelling or validity.
-                      - Only output the verified information and nothing else.`;
+    1. Extract Doctor's Name: Identify and extract the name of the doctor if it is present and clearly mentioned on the prescription.
+    2. Extract Medicine Names: Precisely extract text from the uploaded handwritten prescription image, focusing only on medicine names.
+    3. Extract Medical Tests: Identify any medical tests prescribed in the prescription (e.g., "Blood Test", "X-ray", "MRI", "CBC").
+    4. Extract Disease/Diagnosis Names: Identify any disease or condition mentioned in the prescription (e.g., "Diabetes", "Hypertension", "Asthma").
+    5. Verify Against Medical Databases: Cross-check each extracted name (medicine, test, disease) against a reliable database for accuracy.
+    6. Correct Misspellings and Misreads: Identify and correct any errors caused by handwriting issues.
+    7. Avoid Fabrication: Do not infer or fabricate any names or information not explicitly visible in the prescription.
+    8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). Ensure the format is <Medicine Name> <Number> mg. Validate the dosage for correctness, and if it is invalid, return only the medicine name without the dosage.
+    9. Output Format: Provide the verified information in the following format:
+    
+    Doctor: [Doctor's Name]
+    Medicines:
+    1. [<Medicine Name> <Number> mg]
+    2. [<Medicine Name>]
+    Tests:
+    1. [<Test Name>]
+    Diseases:
+    1. [<Disease Name>]
+    
+    Guidelines:
+      - Ensure accuracy by carefully checking for discrepancies in spelling or validity.
+      - Only output the verified information and nothing else.`;
 
     // Start a chat session
     const chatSession = model.startChat({
@@ -107,7 +115,9 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
       ],
     });
 
-    const result = await chatSession.sendMessage("Analyze the uploaded image and extract doctor's name and medicine names.");
+    const result = await chatSession.sendMessage(
+      "Analyze the uploaded image and extract doctor's name and medicine names."
+    );
     const responseText = result.response.text();
 
     // Extract doctor's name and medicines from the response
@@ -121,8 +131,24 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
 
     // Clean up the uploaded file after processing
     fs.unlinkSync(req.file.path);
+    // Extract tests and diseases from the response
+    const testsMatch = responseText.match(/Tests:\s*([\s\S]*)Diseases:/);
+    const tests = testsMatch
+      ? testsMatch[1]
+          .split("\n")
+          .filter((line) => line.trim() !== "")
+          .map((line) => line.replace(/^\d+\.\s*/, "").trim())
+      : [];
 
-    res.json({ doctorName, medicines });
+    const diseasesMatch = responseText.match(/Diseases:\s*([\s\S]*)/);
+    const diseases = diseasesMatch
+      ? diseasesMatch[1]
+          .split("\n")
+          .filter((line) => line.trim() !== "")
+          .map((line) => line.replace(/^\d+\.\s*/, "").trim())
+      : [];
+
+    res.json({ doctorName, medicines, tests, diseases });
   } catch (error) {
     console.error("Error processing the image:", error);
     res.status(500).json({ error: "Failed to process the image." });
