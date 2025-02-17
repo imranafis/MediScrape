@@ -11,7 +11,7 @@ const {
 const { GoogleAIFileManager } = require("@google/generative-ai/server");
 
 // Initialize Google Generative AI
-const apiKey = "YOUR_API_KEY"; // Replace with actual API key
+const apiKey = "AIzaSyD3gqq1uwMeun7Uejn_qLLBXeGso18wDjA"; // Replace with actual API key
 const genAI = new GoogleGenerativeAI(apiKey);
 const fileManager = new GoogleAIFileManager(apiKey);
 
