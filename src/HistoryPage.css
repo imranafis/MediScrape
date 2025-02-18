@@ -96,16 +96,19 @@ body {
 .doctor-name,
 .disease-name {
   font-size: 18px;
-  color: #333;
-  margin-bottom: 10px;
+  font-weight: bold;
+  color: #777;
+  padding: 10px;
+  margin-left: 30px;
 }
 
 .medicine-title,
 .test-title,
 .doctor-title,
 .disease-title {
-  font-size: 16px;
+  /* font-size: 16px; */
   color: #555;
+  margin-top: 20px;
   margin-bottom: 10px;
   font-weight: bold;
 }
@@ -118,9 +121,11 @@ body {
 
 .medicine-item,
 .test-item {
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px;
+  margin-left: 30px;
   color: #777;
-  margin-bottom: 5px;
 }
 
 .deleteBtn {
