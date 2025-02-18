@@ -150,3 +150,28 @@ body {
   color: #555;
   margin-top: 20px;
 }
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.title {
+  margin: 0;
+}
+
+.pdf-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.pdf-btn:hover {
+  background-color: #0056b3;
+}

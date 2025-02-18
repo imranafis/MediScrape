@@ -86,10 +86,14 @@ const HistoryPage = () => {
       </div>
 
       <div className="container">
-        <h1 className="title">History</h1>
-        <button onClick={downloadPDF} className="pdf-btn">
-          Download PDF
-        </button>
+        <div className="history-header">
+          <h1 className="title">History</h1>
+          {historyData.length > 0 && (
+            <button onClick={downloadPDF} className="pdf-btn">
+              Download PDF
+            </button>
+          )}
+        </div>
 
         {historyData.length > 0 ? (
           <div className="history-grid">
