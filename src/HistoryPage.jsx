@@ -63,12 +63,13 @@ const HistoryPage = () => {
           <div className="history-grid">
             {historyData.map((entry) => (
               <div key={entry.id} className="history-card">
-                <h3 className="doctor-name">Doctor Name: {entry.doctorName}</h3>
+                <h3 className="doctor-title">Doctor Name: </h3>
+                <p className="doctor-name">{entry.doctorName}</p>
 
-                <h4 className="disease-title">Disease:</h4>
-                <p className="disease-name">{entry.disease || "Not Found"}</p>
+                <h3 className="disease-title">Disease:</h3>
+                <p className="disease-name">{entry.disease}</p>
 
-                <h4 className="medicine-title">Medicines:</h4>
+                <h3 className="medicine-title">Medicines:</h3>
                 <ul className="medicine-list">
                   {entry.medicines.map((med, index) => (
                     <li key={index} className="medicine-item">
@@ -77,7 +78,7 @@ const HistoryPage = () => {
                   ))}
                 </ul>
 
-                <h4 className="test-title">Prescribed Tests:</h4>
+                <h3 className="test-title">Prescribed Tests:</h3>
                 {entry.tests && entry.tests.length > 0 ? (
                   <ul className="test-list">
                     {entry.tests.map((test, index) => (

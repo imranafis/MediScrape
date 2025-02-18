@@ -93,25 +93,31 @@ body {
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Enhance hover effect */
 }
 
-.doctor-name {
+.doctor-name,
+.disease-name {
   font-size: 18px;
-  font-weight: bold;
   color: #333;
   margin-bottom: 10px;
 }
 
-.medicine-title {
+.medicine-title,
+.test-title,
+.doctor-title,
+.disease-title {
   font-size: 16px;
   color: #555;
   margin-bottom: 10px;
+  font-weight: bold;
 }
 
-.medicine-list {
+.medicine-list,
+.test-list {
   list-style-type: none;
   padding: 0;
 }
 
-.medicine-item {
+.medicine-item,
+.test-item {
   font-size: 14px;
   color: #777;
   margin-bottom: 5px;
