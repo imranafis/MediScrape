@@ -47,14 +47,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100vw;
-  max-height: calc(
-    100vh - 60px
-  ); /* Prevent it from exceeding viewport height */
+  justify-content: center;
+  width: 80vw;
+  height: 80vh;
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
-  margin: auto; /* Centers the container in the viewport */
+  margin: auto;
 }
 
 .title {

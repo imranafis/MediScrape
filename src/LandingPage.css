@@ -41,16 +41,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Center vertically */
+  justify-content: center;
   width: 80vw;
-  height: 80vh; /* Adjust height to keep spacing */
+  height: 80vh;
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
-  margin: auto; /* Centers horizontally */
-  background: white; /* Optional: to make sure content is visible */
-  border-radius: 10px; /* Optional: for a modern look */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow */
+  margin: auto;
 }
 
 h1 {
