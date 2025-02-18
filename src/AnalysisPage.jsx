@@ -37,17 +37,25 @@ const AnalysisPage = () => {
   };
 
   const downloadPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
     doc.text("Medicine Analysis Report", 14, 15);
 
     autoTable(doc, {
       head: [["Medicine Name", "Count"]],
       body: analysisData,
       startY: 25,
-      styles: { cellPadding: 3, fontSize: 12 },
+      styles: { fontSize: 12, cellPadding: 3 },
+      theme: "grid",
+      tableWidth: "auto",
+      margin: { left: 10, right: 10 },
       columnStyles: {
-        0: { cellWidth: 80 }, // Medicine Name Column Width
-        1: { cellWidth: 40 }, // Count Column Width
+        0: { cellWidth: "auto" },
+        1: { cellWidth: "auto" },
       },
     });
 
