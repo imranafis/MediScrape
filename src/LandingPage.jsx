@@ -1,40 +1,143 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState, useRef } from "react";
+import { useDropzone } from "react-dropzone";
 import { useNavigate } from "react-router-dom";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "/src/lib/firebase";
-import "./HistoryPage.css"; // Add custom CSS for styling
+import {
+  addDoc,
+  setDoc,
+  collection,
+  getDocs,
+  getDoc,
+  updateDoc,
+  doc,
+  deleteDoc,
+  query,
+  orderBy,
+} from "firebase/firestore"; // Firestore imports
+import "./LandingPage.css";
 
-const HistoryPage = () => {
+const LandingPage = () => {
   const navigate = useNavigate();
+  const [doctorName, setDoctorName] = useState(null);
+  const [disease, setDisease] = useState(null);
+  const [medicines, setMedicines] = useState([]);
+  const [tests, setTests] = useState([]);
 
-  const [historyData, setHistoryData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [file, setFile] = useState(null);
+  const [extractionAttempted, setExtractionAttempted] = useState(false);
+
+  const medicineRefs = useRef([]);
+
   const userId = localStorage.getItem("userID");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, userId));
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setHistoryData(data);
-      } catch (err) {
-        console.error("Failed to fetch history:", err);
-      }
-    };
+  const onDrop = useCallback((acceptedFiles) => {
+    if (acceptedFiles.length === 0) return;
 
-    fetchData();
-  }, [userId]);
+    setFile(acceptedFiles[0]);
+    setMedicines([]);
+    setDoctorName(null);
+    setError(null);
+    setExtractionAttempted(false);
+  }, []);
 
-  const handleDelete = async (id) => {
+  const formReset = () => {
+    setDoctorName(null);
+    setDisease(null);
+    setMedicines([]);
+    setTests([]);
+    setFile(null);
+    setExtractionAttempted(false);
+  };
+
+  const extractText = async () => {
+    if (!file) return;
+
+    setLoading(true);
+    setError(null);
+    setExtractionAttempted(false);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
     try {
-      await deleteDoc(doc(db, userId, id));
-      setHistoryData((prevData) => prevData.filter((entry) => entry.id !== id));
-      alert("Entry deleted successfully!");
+      const response = await fetch(
+        "https://mediscrape.onrender.com/MediScrape",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to process the image.");
+      }
+
+      const data = await response.json();
+      setDoctorName(data.doctorName || "Not Found");
+      setDisease(data.disease || "Not Found");
+      setMedicines(data.medicines || ["Not Found"]);
+      setTests(data.tests || ["Not Found"]);
+
+      setExtractionAttempted(true);
     } catch (err) {
-      console.error("Failed to delete entry:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const saveData = async () => {
+    if (medicines.length === 0 && tests.length === 0 && disease.length === 0) {
+      setError(
+        "Doctor's name, medicines, tests, or disease must be filled in."
+      );
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, userId), {
+        doctorName,
+        disease,
+        medicines,
+        tests,
+        date: new Date(),
+      });
+
+      alert("Data saved successfully!");
+
+      // Clear the state
+      formReset();
+    } catch (err) {
+      setError("Failed to save data to Firestore.");
+      console.error(err);
+    }
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { "image/*": [".jpeg", ".png", ".jpg"] },
+    multiple: false,
+  });
+
+  const handleMedicineEdit = (index, newValue) => {
+    const updatedMedicines = [...medicines];
+    updatedMedicines[index] = newValue;
+    setMedicines(updatedMedicines);
+  };
+
+  const handleMedicineDelete = (e, index) => {
+    if (e.key === "Backspace" && e.target.textContent.trim() === "") {
+      e.preventDefault();
+      const updatedMedicines = [...medicines];
+      updatedMedicines.splice(index, 1);
+      setMedicines(updatedMedicines);
+    }
+  };
+
+  const addMedicine = () => {
+    setMedicines([...medicines, ""]);
   };
 
   const handleLogout = () => {
@@ -46,8 +149,8 @@ const HistoryPage = () => {
   return (
     <>
       <div className="header">
-        <button onClick={() => navigate("/Landing")} className="top-btn">
-          Home
+        <button onClick={() => navigate("/history")} className="top-btn">
+          History
         </button>
         <button onClick={() => navigate("/analysis")} className="top-btn">
           Analysis
@@ -56,55 +159,114 @@ const HistoryPage = () => {
           Logout
         </button>
       </div>
-
       <div className="container">
-        <h1 className="title">History</h1>
-        {historyData.length > 0 ? (
-          <div className="history-grid">
-            {historyData.map((entry) => (
-              <div key={entry.id} className="history-card">
-                <h3 className="doctor-name">Doctor Name: {entry.doctorName}</h3>
+        <h1 className="title">Medicine Extractor</h1>
+        <div
+          {...getRootProps()}
+          className={`dropzone ${isDragActive ? "dropzone-active" : ""}`}
+        >
+          <input {...getInputProps()} />
+          <p>
+            {isDragActive
+              ? "Drop the image here..."
+              : "Drag and drop an image, or click to select one (JPEG/PNG)."}
+          </p>
+        </div>
 
-                <h4 className="disease-title">Disease:</h4>
-                <p className="disease-name">{entry.disease || "Not Found"}</p>
+        {file && <p className="file-info">File selected: {file.name}</p>}
 
-                <h4 className="medicine-title">Medicines:</h4>
-                <ul className="medicine-list">
-                  {entry.medicines.map((med, index) => (
-                    <li key={index} className="medicine-item">
-                      {med}
-                    </li>
-                  ))}
-                </ul>
+        <button
+          onClick={extractText}
+          className="extractBtn"
+          disabled={!file || loading}
+        >
+          Extract Medicine
+        </button>
 
-                <h4 className="test-title">Prescribed Tests:</h4>
-                {entry.tests && entry.tests.length > 0 ? (
-                  <ul className="test-list">
-                    {entry.tests.map((test, index) => (
-                      <li key={index} className="test-item">
-                        {test}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="test-name">No tests prescribed</p>
-                )}
+        {loading && <p className="message">Processing, please wait...</p>}
+        {error && <p className="message message-error">{error}</p>}
 
-                <button
-                  className="deleteBtn"
-                  onClick={() => handleDelete(entry.id)}
-                >
-                  Delete
-                </button>
+        {doctorName && (
+          <div className="message message-text">
+            <h3 className="title">Doctor's Name:</h3>
+            <p
+              contentEditable="true"
+              spellCheck="false"
+              suppressContentEditableWarning={true}
+              onBlur={(e) => setDoctorName(e.target.textContent)}
+            >
+              {doctorName}
+            </p>
+          </div>
+        )}
+
+        {disease && (
+          <div className="message message-text">
+            <h3 className="title">Disease Name:</h3>
+            <p
+              contentEditable="true"
+              spellCheck="false"
+              suppressContentEditableWarning={true}
+              onBlur={(e) => setDisease(e.target.textContent)}
+            >
+              {disease}
+            </p>
+          </div>
+        )}
+
+        {medicines.length > 0 && (
+          <div className="message message-text">
+            <h3 className="title">Validated Medicines:</h3>
+            {medicines.map((medicine, index) => (
+              <div
+                key={index}
+                className="editable-div"
+                contentEditable="true"
+                spellCheck="false"
+                suppressContentEditableWarning={true}
+                ref={(el) => (medicineRefs.current[index] = el)}
+                onBlur={(e) => handleMedicineEdit(index, e.target.textContent)}
+                onKeyDown={(e) => handleMedicineDelete(e, index)}
+              >
+                {medicine}
               </div>
             ))}
           </div>
-        ) : (
-          <p className="no-data">No history found.</p>
+        )}
+
+        {tests.length > 0 && (
+          <div className="message message-text">
+            <h3 className="title">Prescribed Tests:</h3>
+            {tests.map((test, index) => (
+              <div key={index} className="editable-div">
+                {test}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {extractionAttempted && medicines.length > 0 && (
+          <>
+            <div className="actionBtn">
+              <button onClick={addMedicine} className="addBtn">
+                Add Medicine
+              </button>
+              <button onClick={formReset} className="cancelBtn">
+                Cancel
+              </button>
+              <button onClick={saveData} className="saveBtn">
+                Save
+              </button>
+            </div>
+          </>
+        )}
+
+        {extractionAttempted && medicines.length === 0 && (
+          <p className="message">No valid medicines found in the image.</p>
         )}
       </div>
     </>
   );
 };
 
-export default HistoryPage;
+export default LandingPage;

@@ -14,7 +14,10 @@ const HistoryPage = () => {
     const fetchData = async () => {
       try {
         const snapshot = await getDocs(collection(db, userId));
-        const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setHistoryData(data);
       } catch (err) {
         console.error("Failed to fetch history:", err);
@@ -61,6 +64,10 @@ const HistoryPage = () => {
             {historyData.map((entry) => (
               <div key={entry.id} className="history-card">
                 <h3 className="doctor-name">Doctor Name: {entry.doctorName}</h3>
+
+                <h4 className="disease-title">Disease:</h4>
+                <p className="disease-name">{entry.disease || "Not Found"}</p>
+
                 <h4 className="medicine-title">Medicines:</h4>
                 <ul className="medicine-list">
                   {entry.medicines.map((med, index) => (
@@ -69,11 +76,25 @@ const HistoryPage = () => {
                     </li>
                   ))}
                 </ul>
+
+                <h4 className="test-title">Prescribed Tests:</h4>
+                {entry.tests && entry.tests.length > 0 ? (
+                  <ul className="test-list">
+                    {entry.tests.map((test, index) => (
+                      <li key={index} className="test-item">
+                        {test}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="test-name">No tests prescribed</p>
+                )}
+
                 <button
                   className="deleteBtn"
                   onClick={() => handleDelete(entry.id)}
                 >
-                Delete
+                  Delete
                 </button>
               </div>
             ))}
