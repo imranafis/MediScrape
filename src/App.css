@@ -1,16 +1,14 @@
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
   display: flex;
   justify-content: flex-end;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
   gap: 1.5rem;
-  padding: 10px 20px;
-  box-sizing: border-box;
-  align-items: center;
-  background: white; /* Add background to avoid content overlap */
-  z-index: 1000; /* Ensure it stays above other elements */
+  padding: 10px 20px; /* Add padding for better spacing */
+  box-sizing: border-box; /* Include padding in dimensions */
+  align-items: center; /* Align buttons vertically */
 }
 
 .top-btn {
