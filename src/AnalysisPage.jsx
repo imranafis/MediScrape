@@ -53,6 +53,11 @@ const AnalysisPage = () => {
       theme: "grid",
       tableWidth: "auto",
       margin: { left: 10, right: 10 },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+      },
       columnStyles: {
         0: { cellWidth: "auto" },
         1: { cellWidth: "auto" },
