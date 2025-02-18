@@ -15,7 +15,6 @@ import { auth, db } from "/src/lib/firebase"; // Import your Firebase auth and f
 import "./LoginPage.css";
 import InputField from "./InputField.jsx";
 
-
 const handleAuthError = (errorCode) => {
   switch (errorCode) {
     case "auth/weak-password":
@@ -37,7 +36,7 @@ const LoginPage = () => {
   useEffect(() => {
     const handleOnLoad = (e) => {
       const userID = localStorage.getItem("userID");
-    if (userID) {
+      if (userID) {
         navigate("/Landing");
       }
     };
@@ -135,7 +134,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container-Login">
       <div className="auth-panel">
         <div className="intro">
           <p className="text">Welcome!</p>
