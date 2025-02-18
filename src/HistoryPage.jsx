@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import { db } from "/src/lib/firebase";
 import "./HistoryPage.css"; // Add custom CSS for styling
 
 const HistoryPage = () => {
   const navigate = useNavigate();
-
   const [historyData, setHistoryData] = useState([]);
   const userId = localStorage.getItem("userID");
 
@@ -43,6 +44,26 @@ const HistoryPage = () => {
     navigate("/"); // Redirect to login page
   };
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    doc.text("Medical History Report", 14, 15);
+
+    const tableData = historyData.map((entry) => [
+      entry.doctorName,
+      entry.disease,
+      entry.medicines.join(", "),
+      entry.tests?.length > 0 ? entry.tests.join(", ") : "No tests prescribed",
+    ]);
+
+    autoTable(doc, {
+      head: [["Doctor Name", "Disease", "Medicines", "Prescribed Tests"]],
+      body: tableData,
+      startY: 25,
+    });
+
+    doc.save("Medical_History.pdf");
+  };
+
   return (
     <>
       <div className="header">
@@ -59,6 +80,10 @@ const HistoryPage = () => {
 
       <div className="container">
         <h1 className="title">History</h1>
+        <button onClick={downloadPDF} className="pdf-btn">
+          Download PDF
+        </button>
+
         {historyData.length > 0 ? (
           <div className="history-grid">
             {historyData.map((entry) => (
