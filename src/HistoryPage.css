@@ -44,6 +44,7 @@ body {
   overflow-y: auto;
   margin: auto; /* Centers the container in the viewport */
 }
+
 .title {
   color: #007bff;
   margin-bottom: 20px;
