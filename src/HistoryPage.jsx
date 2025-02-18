@@ -51,14 +51,21 @@ const HistoryPage = () => {
     const tableData = historyData.map((entry) => [
       entry.doctorName,
       entry.disease,
-      entry.medicines.join(", "),
-      entry.tests?.length > 0 ? entry.tests.join(", ") : "No tests prescribed",
+      entry.medicines.map((med) => `• ${med}`).join("\n"), // Convert medicines into a bulleted list
+      entry.tests?.length > 0
+        ? entry.tests.map((test) => `• ${test}`).join("\n")
+        : "No tests prescribed",
     ]);
 
     autoTable(doc, {
       head: [["Doctor Name", "Disease", "Medicines", "Prescribed Tests"]],
       body: tableData,
       startY: 25,
+      styles: { cellPadding: 3, fontSize: 10 },
+      columnStyles: {
+        2: { cellWidth: 60 }, // Medicines column width for better spacing
+        3: { cellWidth: 60 }, // Tests column width for better spacing
+      },
     });
 
     doc.save("Medical_History.pdf");
