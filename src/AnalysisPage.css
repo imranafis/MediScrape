@@ -58,12 +58,32 @@ body {
   margin: auto;
 }
 
-/* Title styling */
+.analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
 .title {
   color: #007bff;
-  margin-bottom: 20px;
-  font-size: 24px;
-  text-align: center;
+  font-size: 2rem; /* Larger font size for emphasis */
+  font-weight: bold;
+}
+
+.pdf-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.pdf-btn:hover {
+  background-color: #0056b3;
 }
 
 /* Grid styling for analysis cards */
