@@ -1,6 +1,6 @@
 /* General body styling */
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   background-color: #f8f9fa;
   margin: 0;
   padding: 0;
@@ -33,18 +33,16 @@ body {
   opacity: 1; /* Fully opaque on hover */
 }
 
-
-/* Container styling */
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 100vw; /* Full width of the viewport */
-  height: calc(100vh - 60px); /* Subtract header height (adjust if necessary) */
+  width: 100vw;
+  min-height: 100vh; /* Ensures full height when content is small */
   padding: 20px;
-  box-sizing: border-box; /* Include padding within width/height */
-  overflow-y: auto; /* Enable scrolling if content overflows */
+  box-sizing: border-box;
+  overflow-y: auto;
+  flex-grow: 1; /* Makes sure it grows and allows scrolling */
 }
 
 /* Title styling */
@@ -58,7 +56,10 @@ body {
 /* Grid styling for analysis cards */
 .analysis-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive layout */
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(300px, 1fr)
+  ); /* Responsive layout */
   gap: 20px;
   width: 100%; /* Full container width */
   max-width: 30rem; /* Optional: Limit grid width */

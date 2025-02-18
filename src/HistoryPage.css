@@ -35,12 +35,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 100vw; /* Full width of the viewport */
-  height: calc(100vh - 60px); /* Subtract header height (adjust if necessary) */
+  width: 100vw;
+  min-height: 100vh; /* Ensures full height when content is small */
   padding: 20px;
-  box-sizing: border-box; /* Include padding within width/height */
-  overflow-y: auto; /* Enable scrolling if content overflows */
+  box-sizing: border-box;
+  overflow-y: auto;
+  flex-grow: 1; /* Makes sure it grows and allows scrolling */
 }
 
 .title {
