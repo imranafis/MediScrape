@@ -1,7 +1,12 @@
 /* General styling */
 body {
+  font-family: Arial, sans-serif;
+  background-color: rgb(211, 241, 248);
+  margin: 0;
+  height: 100vh;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .container {
@@ -9,11 +14,13 @@ body {
   flex-direction: column;
   align-items: center;
   width: 100vw;
-  min-height: 100vh; /* Ensures full height when content is small */
+  max-height: calc(
+    100vh - 60px
+  ); /* Prevent it from exceeding viewport height */
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
-  flex-grow: 1; /* Makes sure it grows and allows scrolling */
+  margin: auto; /* Centers the container in the viewport */
 }
 
 h1 {

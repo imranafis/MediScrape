@@ -38,11 +38,13 @@ body {
   flex-direction: column;
   align-items: center;
   width: 100vw;
-  min-height: 100vh; /* Ensures full height when content is small */
+  max-height: calc(
+    100vh - 60px
+  ); /* Prevent it from exceeding viewport height */
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
-  flex-grow: 1; /* Makes sure it grows and allows scrolling */
+  margin: auto; /* Centers the container in the viewport */
 }
 
 /* Title styling */
