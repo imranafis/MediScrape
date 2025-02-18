@@ -1,3 +1,12 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: rgb(211, 241, 248);
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .header {
   display: flex;
   justify-content: flex-end;
@@ -6,9 +15,9 @@
   width: 100%;
   z-index: 1000;
   gap: 1.5rem;
-  padding: 10px 20px; /* Add padding for better spacing */
-  box-sizing: border-box; /* Include padding in dimensions */
-  align-items: center; /* Align buttons vertically */
+  padding: 10px 20px;
+  box-sizing: border-box;
+  align-items: center;
 }
 
 .top-btn {

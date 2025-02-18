@@ -1,13 +1,4 @@
 /* General styling */
-body {
-  font-family: Arial, sans-serif;
-  background-color: rgb(211, 241, 248);
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .container {
   display: flex;
