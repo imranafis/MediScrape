@@ -70,20 +70,20 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
     7. Avoid Fabrication: Do not infer or fabricate any names or information not explicitly visible in the prescription.
     8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). Ensure the format is <Medicine Name> <Number> mg. Validate the dosage for correctness, and if it is invalid, return only the medicine name without the dosage.
     9. Calculate the required quantity of each medicine based on dosage instructions. If a medicine is written as '0+1+0 ---- 1 month', it means the patient needs one pill per day for a month, resulting in 30 or 31 pills. Extract and display this information in the format:  
-      - [<Medicine Name> <Number> mg (<number> of Pieces)]
+      - [<Medicine Name> <Number> mg (<number> Pieces)]
     10. Output Format: Provide the verified information in the following format:
 
     Doctor: [Doctor's Name]
     Disease: [Disease Name]
     Medicines:
-    1.[<Medicine Name> <Number> mg (<number> of Pieces)]
-    2. [<Medicine Name> (<number> of Pieces)]
+    1.[<Medicine Name> <Number> mg (<number> Pieces)]
+    2. [<Medicine Name> (<number> Pieces)]
     Tests:
     1. [<Test Name>]
 
     Guidelines:
       - Ensure accuracy by carefully checking for discrepancies in spelling or validity.
-      - Only output the verified information and nothing else.`;
+      - If no information is found for any category, return 'Not Found' instead of any error message.`;
 
     const chatSession = model.startChat({
       generationConfig,
