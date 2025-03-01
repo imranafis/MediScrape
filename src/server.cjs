@@ -120,18 +120,22 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
     const diseaseMatch = responseText.match(/Disease:\s*(.*)/);
     const disease = diseaseMatch ? diseaseMatch[1].trim() : "Not Found";
 
-    const medicines = responseText
-      .split("\n")
-      .filter((line) => /^\d+\.\s/.test(line))
-      .map((line) => line.replace(/^\d+\.\s*/, "").trim());
+    const medicines =
+      responseText
+        .split("Medicines:")[1]
+        ?.split("Tests:")[0]
+        ?.trim()
+        .split("\n")
+        .filter((line) => /^\d+\.\s/.test(line))
+        .map((line) => line.replace(/^\d+\.\s*/, "").trim()) || [];
 
-    const testsMatch = responseText.match(/Tests:\s*([\s\S]*)/);
-    const tests = testsMatch
-      ? testsMatch[1]
-          .split("\n")
-          .filter((line) => line.trim() !== "")
-          .map((line) => line.replace(/^\d+\.\s*/, "").trim())
-      : [];
+    const tests =
+      responseText
+        .split("Tests:")[1]
+        ?.trim()
+        .split("\n")
+        .filter((line) => /^\d+\.\s/.test(line))
+        .map((line) => line.replace(/^\d+\.\s*/, "").trim()) || [];
 
     fs.unlinkSync(req.file.path);
 
