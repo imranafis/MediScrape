@@ -231,7 +231,7 @@ const LandingPage = () => {
           </div>
         )}
 
-        {tests.length > 0 && (
+        {tests.length > 0 ? (
           <div className="message message-text">
             <h3 className="title">Prescribed Tests:</h3>
             {tests.map((test, index) => (
@@ -239,6 +239,13 @@ const LandingPage = () => {
                 {test}
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="message message-text">
+            <h3 className="title">Prescribed Tests:</h3>
+            <div key={index} className="editable-div">
+              Not Found
+            </div>
           </div>
         )}
 
