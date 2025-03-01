@@ -64,7 +64,7 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
     8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). Ensure the format is <Medicine Name> <Number> mg. Validate the dosage for correctness, and if it is invalid, return only the medicine name without the dosage.
     9. Extract all medicine names, their dosages, and the exact quantity as written in the prescription.
         - If dosage instructions and duration are in Bangla, interpret them correctly.
-        - Calculate the total number of pieces for each medicine based on the dosage and duration.
+        - Calculate the total number of pieces for each medicine based on the dosage and duration, representing the total quantity a user needs to buy.
         - Handle variations in duration units like "মাস" (month), "সপ্তাহ" (week), "দিন" (day), and other instructions like "চলবে" (continue), "বমি অনুভব করেন" (feel nauseous).
         - If the number of pieces is not directly mentioned, calculate it based on the given dosage and duration.
         - If the duration is not a specific number, and only says "চলবে" or "continue", return the medicine name and dosage only, and write "Continue".
@@ -76,14 +76,16 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
         - If the dosage includes "1/2" or "½", and the duration is "১ সপ্তাহ", calculate the total pieces based on the daily dosage (including the half) multiplied by 7.
         - If the dosage includes "1/2" or "½", and the duration is "১ দিন", calculate the total pieces based on the daily dosage (including the half).
         - **If the duration is "1 month", multiply the daily dosage by 30 to get the total number of pieces.**
+        - **Include any additional instructions alongside the calculated total pieces, such as "3 times a day বমি অনুভব করেন" or "2 times a day চলবে".**
     10. Output Format: Provide the verified information in the following format:
 
     Doctor: [Doctor's Name]
     Disease: [Disease Name]
     Medicines:
     1. [<Medicine Name> <Number> mg (<Number> Pieces and any additional instruction)]
-    2. [<Medicine Name> <Number> mg (<Number> Pieces Continue)]
-    3. [<Medicine Name> <Number> mg (Quantity Not Found)]
+    2. [<Medicine Name> <Number> mg (<Number> Pieces)]
+    3. [<Medicine Name> <Number> mg (<Number> Pieces Continue)]
+    4. [<Medicine Name> <Number> mg (Quantity Not Found)]
     Tests:
     1. [<Test Name>]
 
@@ -99,7 +101,8 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
         - If the duration is in দিন, use that number.
         - If the duration is in month, multiply the daily dosage by 30 to get the total quantity.
         - If the duration is in week, multiply the daily dosage by 7 to get the total quantity.
-        - If the duration is in day, use that number.`;
+        - If the duration is in day, use that number.
+        - **Include any additional instruction alongside the total number of pieces.**`;
 
 console.log(promptMsg);
 
