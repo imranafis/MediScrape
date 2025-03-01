@@ -243,9 +243,7 @@ const LandingPage = () => {
         ) : (
           <div className="message message-text">
             <h3 className="title">Prescribed Tests:</h3>
-            <div key={index} className="editable-div">
-              Not Found
-            </div>
+            <div className="editable-div">Not Found</div>
           </div>
         )}
 
