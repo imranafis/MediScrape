@@ -74,8 +74,14 @@ const LandingPage = () => {
       const data = await response.json();
       setDoctorName(data.doctorName || "Not Found");
       setDisease(data.disease || "Not Found");
-      setMedicines(data.medicines || ["Not Found"]);
-      setTests(data.tests || ["Not Found"]);
+      setMedicines(
+        data.medicines && data.medicines.length > 0
+          ? data.medicines
+          : ["Not Found"]
+      );
+      setTests(
+        data.tests && data.tests.length > 0 ? data.tests : ["Not Found"]
+      );
 
       setExtractionAttempted(true);
     } catch (err) {
