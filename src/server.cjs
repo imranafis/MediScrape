@@ -11,7 +11,7 @@ const {
 const { GoogleAIFileManager } = require("@google/generative-ai/server");
 
 // Initialize Google Generative AI
-const apiKey = "AIzaSyD3gqq1uwMeun7Uejn_qLLBXeGso18wDjA"; // Replace with actual API key
+const apiKey = "AIzaSyD3gqq1uwMeun7Uejn_qLLBXeGso18wDjA"; // Replace with your actual API key
 const genAI = new GoogleGenerativeAI(apiKey);
 const fileManager = new GoogleAIFileManager(apiKey);
 
@@ -53,13 +53,7 @@ const generationConfig = {
   responseMimeType: "text/plain",
 };
 
-app.post("/MediScrape", upload.single("image"), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-
-  try {
-    const uploadedFile = await uploadToGemini(req.file.path, req.file.mimetype);
-
-    const promptMsg = `You are an intelligent assistant specializing in extracting information from handwritten prescription images. Your task is to:
+const promptMsg = `You are an intelligent assistant specializing in extracting information from handwritten prescription images. Your task is to:
 
     1. Extract Doctor's Name: Identify and extract the name of the doctor if it is present and clearly mentioned on the prescription.
     2. Extract Medicine Names: Precisely extract text from the uploaded handwritten prescription image, focusing only on medicine names.
@@ -70,26 +64,44 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
     7. Avoid Fabrication: Do not infer or fabricate any names or information not explicitly visible in the prescription.
     8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). Ensure the format is <Medicine Name> <Number> mg. Validate the dosage for correctness, and if it is invalid, return only the medicine name without the dosage.
     9. Extract all medicine names, their dosages, and the exact quantity as written in the prescription. 
-   - Dosage and quantity information can be in English or Bangla.
-   - Format the results in a table with columns for Medicine Name, Dosage Instructions, and Quantity.
-   - Do not modify any values—provide them exactly as written in the prescription, including Bangla numerals and words.
-   - Represent the quantity in the "Quantity" column as a numerical value, even if written in Bangla. Convert Bangla numerals to their equivalent English numerals.
-   - [<Medicine Name> <Number> mg (<number> of Pieces)]
-   - If the quantity is written in Bangla words, convert it to numerical values. for example যদি 10 টি লিখা থাকে তাহলে 10 লিখবেন।
+        - If dosage instructions and duration are in Bangla, interpret them correctly.
+        - Calculate the total number of pieces for each medicine based on the dosage and duration.
+        - Handle variations in duration units like "মাস" (month), "সপ্তাহ" (week), "দিন" (day), and other instructions like "চলবে" (continue), "বমি অনুভব করেন" (feel nauseous).
+        - If the number of pieces is not directly mentioned, calculate it based on the given dosage and duration.
+        - If the duration is not a specific number, and only says "চলবে" or "continue", return the medicine name and dosage only, and write "Continue".
+        - If the dosage is "1+0+1" and duration is "১ মাস", the total pieces should be 2 * 30 = 60.
+        - If you cannot calculate the total number of pieces, write "Quantity Not Found".
     10. Output Format: Provide the verified information in the following format:
 
     Doctor: [Doctor's Name]
     Disease: [Disease Name]
     Medicines:
-    1.[<Medicine Name> <Number> mg (<number> of Pieces)]
-    2. [<Medicine Name> (<number> of Pieces)]
+    1. [<Medicine Name> <Number> mg (<number> of Pieces)]
+    2. [<Medicine Name> (Continue)]
+    3. [<Medicine Name> (Quantity Not Found)]
     Tests:
     1. [<Test Name>]
 
     Guidelines:
-      - Ensure accuracy by carefully checking for discrepancies in spelling or validity.
-      - Only output the verified information and nothing else.
-      - Please do not give output reasults in bold and no error massage if someting is meassing return not found`;
+        - Ensure accuracy by carefully checking for discrepancies in spelling or validity.
+        - Only output the verified information and nothing else.
+        - Please do not give output reasults in bold and no error massage if someting is meassing return not found.
+        - Perform all calculations and interpretations of Bangla within the response itself. Do not leave any calculations for the client to perform.
+        - If the quantity is directly written in the image, use that value. Do not attempt to recalculate.
+        - If a medicine has multiple dosages in a day, add those values together to get the daily dosage.
+        - If the duration is in মাস, multiply the daily dosage by 30 to get the total quantity.
+        - If the duration is in সপ্তাহ, multiply the daily dosage by 7 to get the total quantity.
+        - If the duration is in দিন, use that number.
+        - If the duration is in month, multiply the daily dosage by 30 to get the total quantity.
+        - If the duration is in week, multiply the daily dosage by 7 to get the total quantity.
+        - If the duration is in day, use that number.
+`;
+
+app.post("/MediScrape", upload.single("image"), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+  try {
+    const uploadedFile = await uploadToGemini(req.file.path, req.file.mimetype);
 
     const chatSession = model.startChat({
       generationConfig,
@@ -116,8 +128,11 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
     const disease = diseaseMatch ? diseaseMatch[1].trim() : "Not Found";
 
     const medicines = responseText
+      .split("Medicines:\n")[1]
+      .split("Tests:\n")[0]
+      .trim()
       .split("\n")
-      .filter((line) => /^\d+\.\s/.test(line))
+      .filter((line) => line.trim() !== "")
       .map((line) => line.replace(/^\d+\.\s*/, "").trim());
 
     const testsMatch = responseText.match(/Tests:\s*([\s\S]*)/);
