@@ -69,8 +69,13 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
     6. Correct Misspellings and Misreads: Identify and correct any errors caused by handwriting issues.
     7. Avoid Fabrication: Do not infer or fabricate any names or information not explicitly visible in the prescription.
     8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). Ensure the format is <Medicine Name> <Number> mg. Validate the dosage for correctness, and if it is invalid, return only the medicine name without the dosage.
-    9. Extract all medicine names, their dosages, and the exact quantity as written in the prescription. Format the results in a table with columns for Medicine Name, Dosage Instructions, and Quantity. Do not modify any values—provide them exactly as written in the prescription 
-      - [<Medicine Name> <Number> mg (<number> of Pieces)]
+    9. Extract all medicine names, their dosages, and the exact quantity as written in the prescription. 
+   - Dosage and quantity information can be in English or Bangla.
+   - Format the results in a table with columns for Medicine Name, Dosage Instructions, and Quantity.
+   - Do not modify any values—provide them exactly as written in the prescription, including Bangla numerals and words.
+   - Represent the quantity in the "Quantity" column as a numerical value, even if written in Bangla. Convert Bangla numerals to their equivalent English numerals.
+   - [<Medicine Name> <Number> mg (<number> of Pieces)]
+   - If the quantity is written in Bangla words, convert it to numerical values. for example যদি 10 টি লিখা থাকে তাহলে 10 লিখবেন।
     10. Output Format: Provide the verified information in the following format:
 
     Doctor: [Doctor's Name]
