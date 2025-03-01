@@ -63,11 +63,14 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
     7. Avoid Fabrication: Do not infer or fabricate any names or information not explicitly visible in the prescription.
     8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). Ensure the format is <Medicine Name> <Number> mg. Validate the dosage for correctness, and if it is invalid, return only the medicine name without the dosage.
     9. Extract all medicine names, their dosages, and the exact quantity as written in the prescription.
-    10. Calculate the total number of pieces of each medicine based on the dosage instructions. If the dosage is in Bangla (e.g., "১ মাস", "২ সপ্তাহ"), convert it to the total number of pieces needed. Assume:
-        - ১ মাস = 30 pieces
-        - ১ সপ্তাহ = 7 pieces
-        - ১0 দিন = 10 pieces
-        - If the dosage includes frequencies like "1+0+1", calculate the daily total and multiply by the duration.
+    10. Calculate the total number of pieces of each medicine based on the dosage instructions. Pay close attention to dosage frequencies and fractions:
+        - If the dosage includes frequencies like "1+0+1" for this it will 2, "0+0+1/2" for this it will 0.5, "1+1+1" for this it will 3, calculate the daily total.
+        - If a fraction (e.g., "1/2") is present, treat it as a decimal (e.g., 0.5).
+        - If a duration (e.g., "১ মাস", "২ সপ্তাহ", "1 month", "2 weeks", "১0 দিন" , "10 days") is given, multiply the daily total by the duration. Assume:
+            - ১ মাস = 30 pieces
+            - ১ সপ্তাহ = 7 pieces
+            - ১0 দিন = 10 pieces
+        - If no duration is given, but instructions like "চলবে", "মাথাব্যথা হলে", "continue" are present, only include the daily dosage total and the instruction.
         - If the quantity cannot be determined, indicate "Quantity Not Found".
     11. Output Format: Provide the verified information in the following format, including the calculated total pieces:
 
@@ -84,10 +87,10 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
     Guidelines:
         - Ensure accuracy by carefully checking for discrepancies in spelling or validity.
         - Perform all calculations directly within the response.
+        - Pay close attention to fractions and dosage frequencies.
         - Only output the verified information and nothing else.
         - Please do not give output results in bold and no error message if something is missing return not found.
 `;
-
 app.post("/MediScrape", upload.single("image"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
@@ -106,9 +109,8 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
         },
       ],
     });
-
     const result = await chatSession.sendMessage(
-      "Analyze the uploaded image and extract doctor's name, disease, medicines, and tests."
+      "Analyze the uploaded image and extract doctor's name, disease, medicines, and tests. Perform all dosage calculations."
     );
     const responseText = result.response.text();
 
@@ -119,11 +121,8 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
     const disease = diseaseMatch ? diseaseMatch[1].trim() : "Not Found";
 
     const medicines = responseText
-      .split("Medicines:\n")[1]
-      .split("Tests:\n")[0]
-      .trim()
       .split("\n")
-      .filter((line) => line.trim() !== "")
+      .filter((line) => /^\d+\.\s/.test(line))
       .map((line) => line.replace(/^\d+\.\s*/, "").trim());
 
     const testsMatch = responseText.match(/Tests:\s*([\s\S]*)/);
