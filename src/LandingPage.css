@@ -41,8 +41,8 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
   width: 100%;
   min-height: 80vh;
   padding: 20px;

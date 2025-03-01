@@ -35,11 +35,8 @@ const LandingPage = () => {
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles.length === 0) return;
 
-    setFile(acceptedFiles[0]);
-    setMedicines([]);
-    setDoctorName(null);
-    setError(null);
-    setExtractionAttempted(false);
+    formReset(); // Reset the form when a new image is selected
+    setFile(acceptedFiles[0]); // Then set the new file
   }, []);
 
   const formReset = () => {
