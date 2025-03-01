@@ -71,7 +71,7 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
         - If the duration is not a specific number, and only says "চলবে" or "continue", return the medicine name and dosage only, and write "Continue".
         - If the dosage is "1+0+1" and duration is "১ মাস", the total pieces should be 2 * 30 = 60.
         - If you cannot calculate the total number of pieces, write "Quantity Not Found".
-        - If a dosage is written as "1/2", interpret it as "half".
+        - If a dosage is written as "1/2" or "½", interpret it as "half". When calculating the total pieces, treat "half" as 0.5.
         - If any additional instructions are present beside the dosage or duration, include those instructions in the output within parentheses.
     10. Output Format: Provide the verified information in the following format:
 
