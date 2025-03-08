@@ -53,52 +53,52 @@ const generationConfig = {
   responseMimeType: "text/plain",
 };
 
-const promptMsg = `You are an expert medical prescription analyst. Your task is to extract and process information from handwritten prescription images with high accuracy, especially concerning medicine dosages and quantities.
+const promptMsg = `You are an expert medical prescription data extraction and calculation assistant. Your task is to accurately process handwritten prescription images and provide structured information.
 
-**Instructions:**
-
-1.  **Doctor's Name:** Extract the doctor's name if clearly present. If not found, return "Not Found".
-2.  **Disease/Diagnosis:** Identify and extract any diagnosed diseases or conditions. If not found, return "Not Found".
-3.  **Medicine Names and Dosages:**
-    * Extract each medicine's name and its numerical dosage (e.g., "Indomet 25 mg").
-    * Validate the dosage. If invalid or unclear, return only the medicine name.
-4.  **Medicine Quantities and Durations:**
-    * Extract dosage instructions, including frequencies (e.g., "1+0+1", "0+0+1/2") and durations (e.g., "১ মাস", "২ সপ্তাহ", "10 days", "1 month", "2 weeks").
-    * Convert fractions to decimals (e.g., "1/2" to 0.5).
-    * Calculate the total number of medicine pieces based on the following:
-        * Daily dosage: Sum the frequencies (e.g., "1+0+1" = 2, "0+0+1/2" = 0.5).
-        * Duration:
-            * "১ মাস" = 30 days
-            * "১ সপ্তাহ" or "1 week" = 7 days
-            * "২ সপ্তাহ" or "2 weeks" = 14 days
-            * "১0 দিন" or "10 days" = 10 days
-            * Multiply the daily dosage by the duration in days.
-        * If the prescription contains words like "চলবে", "continue", or "মাথাব্যথা হলে" and does not have a duration, only return the daily dosage and the instruction.
-        * If the quantity cannot be determined, return "Quantity Not Found".
-5.  **Medical Tests:** Extract the names of any prescribed medical tests (e.g., "Blood Test", "X-ray"). If not found, return "Not Found".
-6.  **Verification and Correction:**
-    * Cross-reference extracted information with medical databases for accuracy.
+1.  **Doctor's Name:** Extract the doctor's name if present and clearly legible. If not found, return "Not Found".
+2.  **Disease/Diagnosis:** Extract any disease or condition mentioned. If not found, return "Not Found".
+3.  **Medical Tests:** Extract prescribed medical tests (e.g., "Blood Test", "X-ray"). If not found, return "Not Found".
+4.  **Medicine Names and Dosages:**
+    * Precisely extract each medicine name.
+    * Extract the dosage (e.g., "25 mg", "500 mcg").
+    * Ensure the format is "<Medicine Name> <Number> <unit>".
+    * Validate the dosage unit (mg, mcg, ml, etc.). If invalid, return only the medicine name and "Dosage Invalid".
+5.  **Dosage Frequency and Duration:**
+    * Extract dosage frequencies (e.g., "1+0+1", "0+0+1/2", "1+1+1").
+    * Extract duration if provided (e.g., "১ মাস", "২ সপ্তাহ", "10 days", "1 month", "2 weeks").
+    * Handle phrases like "চলবে", "মাথাব্যথা হলে", "continue", indicating ongoing use.
+6.  **Total Pieces Calculation:**
+    * Calculate the daily dosage total based on the frequency.
+    * Treat fractions (e.g., "1/2") as decimals (0.5).
+    * If a duration is given:
+        * "১ মাস" = 30 days
+        * "১ সপ্তাহ" = 7 days
+        * "10 দিন" = 10 days
+        * Multiply the daily total by the duration.
+    * If "চলবে", "মাথাব্যথা হলে", or "continue" are present, include the daily total and the phrase.
+    * If quantity cannot be determined return "Quantity Not Found".
+7.  **Verification and Correction:**
+    * Cross-reference medicine names, dosages, and tests against medical databases to verify accuracy.
     * Correct misspellings and misreads caused by handwriting.
-    * Do not fabricate information. Only include what is explicitly present.
-7.  **Output Format:**
-    Doctor: [Doctor's Name]
-    Disease: [Disease Name]
-    Medicines:
-    1. [Medicine Name] [Dosage] mg ([Total Pieces] Pieces [Additional Instructions])
-    2. [Medicine Name] [Dosage] mg ([Total Pieces] Pieces)
-    3. [Medicine Name] [Dosage] mg ([Daily Dosage] Pieces Continue)
-    4. [Medicine Name] [Dosage] mg (Quantity Not Found)
-    Tests:
-    1. [Test Name]
+    * Do not fabricate information. Only extract what is explicitly present.
+8.  **Output Format:**
+    * Doctor: [Doctor's Name] or Not Found
+    * Disease: [Disease Name] or Not Found
+    * Medicines:
+        1.  [<Medicine Name> <Number> <unit> (<Total Pieces> Pieces) or (<Total Pieces> Pieces Continue) or (Quantity Not Found) or (Dosage Invalid)]
+        2.  [<Medicine Name> <Number> <unit> (<Total Pieces> Pieces)]
+        3.  ...
+    * Tests:
+        1.  [<Test Name>] or Not Found
+        2.  ...
 
-**Important Considerations:**
+**Guidelines:**
 
-* Focus on precise calculations for dosage and quantity.
-* Handle fractions and frequencies accurately.
-* Clearly differentiate between duration based calculations and "continue" based calculations.
-* Return "Not Found" when information is absent.
-* Do not return any bold text.
-* Only return the requested data.
+* Prioritize accuracy in extraction and calculations.
+* Handle variations in handwriting and terminology.
+* Do not provide bold output.
+* Return "Not Found" rather than error messages.
+* Clearly distinguish between dosage units (mg, mcg, ml etc.).
 `;
 
 app.post("/MediScrape", upload.single("image"), async (req, res) => {
