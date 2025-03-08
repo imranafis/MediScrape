@@ -70,12 +70,14 @@ const promptMsg = `You are an expert medical prescription data extractor and cal
      - "১ মাস" or "1 month" = 30 days
      - "১ সপ্তাহ" or "1 week" = 7 days
      - "১0 দিন" or "10 days" = 10 days
-   - If "চলবে", "মাথাব্যথা হলে", "continue", or similar instructions are present, note them without calculating a total.
    - If quantity is not explicitly stated, return "Quantity Not Found".
 6. **Total Pieces Calculation:**
    - Multiply the daily dosage total by the duration (in days) to calculate the total pieces for each medicine.
+   - **When a fraction like "1/2" is present in the dosage frequency, treat it as 0.5 and include it in the daily dosage calculation.**
    - If no duration is provided but there are "continue" instructions, only provide the daily dosage and note the instruction.
    - If quantity is "Quantity Not Found" do not attempt to calculate the total piece.
+   - **Example:** If the dosage is "1+0+1/2" and the duration is "10 days", calculate the daily dosage as 1 + 0 + 0.5 = 1.5. Then, calculate the total pieces as 1.5 * 10 = 15 pieces.
+
 7. **Accuracy and Validation:**
    - Correct misspellings and misreads by cross-referencing with medical databases.
    - Do not fabricate information. Only extract what is explicitly present.
