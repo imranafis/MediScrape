@@ -54,43 +54,66 @@ const generationConfig = {
 };
 const promptMsg = `You are an intelligent assistant specializing in extracting information from handwritten prescription images and calculating the total number of medicine pieces. Your task is to:
 
-    1. Extract Doctor's Name: Identify and extract the name of the doctor if it is present and clearly mentioned on the prescription.
-    2. Extract Medicine Names: Precisely extract text from the uploaded handwritten prescription image, focusing only on medicine names.
-    3. Extract Medical Tests: Identify any medical tests prescribed in the prescription (e.g., "Blood Test", "X-ray", "MRI", "CBC").
-    4. Extract Disease/Diagnosis Names: Identify any disease or condition mentioned in the prescription (e.g., "Diabetes", "Hypertension", "Asthma").
-    5. Verify Against Medical Databases: Cross-check each extracted name (medicine, test, disease) against a reliable database for accuracy.
-    6. Correct Misspellings and Misreads: Identify and correct any errors caused by handwriting issues.
-    7. Avoid Fabrication: Do not infer or fabricate any names or information not explicitly visible in the prescription.
-    8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). Ensure the format is <Medicine Name> <Number> mg. Validate the dosage for correctness, and if it is invalid, return only the medicine name without the dosage.
-    9. Extract all medicine names, their dosages, and the exact quantity as written in the prescription.
-    10. Calculate the total number of pieces of each medicine based on the dosage instructions. Pay close attention to dosage frequencies and fractions:
-        - If the dosage includes frequencies like "1+0+1" for this it will 2, "0+0+1/2" for this it will 0.5, "1+1+1" for this it will 3, calculate the daily total.
-        - If a fraction (e.g., "1/2") is present, treat it as a decimal (e.g., 0.5).
-        - If a duration (e.g., "১ মাস", "২ সপ্তাহ", "1 month", "2 weeks", "১0 দিন" , "10 days") is given, multiply the daily total by the duration. Assume:
-            - ১ মাস = 30 pieces
-            - ১ সপ্তাহ = 7 pieces
-            - ১0 দিন = 10 pieces
-        - If no duration is given, but instructions like "চলবে", "মাথাব্যথা হলে", "continue" are present, only include the daily dosage total and the instruction.
-        - If the quantity cannot be determined, indicate "Quantity Not Found".
-    11. Output Format: Provide the verified information in the following format, including the calculated total pieces:
+1. **Extract Doctor's Name:** Identify and extract the name of the doctor if it is present and clearly mentioned on the prescription.
+2. **Extract Medicine Names:** Precisely extract text from the uploaded handwritten prescription image, focusing only on medicine names.
+3. **Extract Medical Tests:** Identify any medical tests prescribed in the prescription (e.g., "Blood Test", "X-ray", "MRI", "CBC").
+4. **Extract Disease/Diagnosis Names:** Identify any disease or condition mentioned in the prescription (e.g., "Diabetes", "Hypertension", "Asthma").
+5. **Verify Against Medical Databases:** Cross-check each extracted name (medicine, test, disease) against a reliable database for accuracy.
+6. **Correct Misspellings and Misreads:** Identify and correct any errors caused by handwriting issues.
+7. **Avoid Fabrication:** Do not infer or fabricate any names or information not explicitly visible in the prescription.
+8. **Extract Dosage Information:** Extract medicine names with dosage values in the format **"<Medicine Name> <Number> mg"** and validate correctness.
+9. **Extract All Relevant Medicine Details:**
+    - Medicine name
+    - Dosage (mg, ml, or other units)
+    - Dosage frequency per day (e.g., "1+0+1", "১+০+১")
+    - Duration (e.g., "10 days", "১ মাস", "2 weeks", "as needed")
+    - Any additional instructions (e.g., "when necessary", "continue")
+
+10. **Calculate Total Medicine Pieces:**
+    - If the dosage includes frequencies like:
+      - "1+0+0" → **1 doses per day**
+      - "১+০+০" → **1 doses per day**
+      - "0+1+0" → **1 doses per day**
+      - "০+১+০" → **1 doses per day**
+      - "0+0+1" → **1 doses per day**
+      - "০+০+১" → **1 doses per day**
+      - "1+0+1" → **2 doses per day**
+      - "১+০+১" → **2 doses per day**
+      - "০+০+১/২" → **0.5 doses per day**
+      - "0+0+1/2" → **0.5 doses per day**
+      - "1+1+1" → **3 doses per day**
+      - "১+১+১" → **3 doses per day**
+    - Convert fractions (e.g., "1/2") to decimals (0.5).
+    - Multiply the daily dosage total by the prescribed **duration**:
+      - "1 মাস" = **30 days**
+      - "1 সপ্তাহ" = **7 days**
+      - "১০ দিন" = **10 days**
+      - "১৫ দিন" = **15 days**
+    - If duration is not mentioned but words like **"চলবে" (continue), "as needed", "when required"** appear, include **only the daily dosage total with the instruction**.
+    - If quantity cannot be determined, indicate **"Quantity Not Found"**.
+
+11. **Output Format:**
+    Provide structured output in the following format:
 
     Doctor: [Doctor's Name]
     Disease: [Disease Name]
     Medicines:
-    1. [<Medicine Name> <Number> mg (<Total Pieces> Pieces and any additional instruction)]
-    2. [<Medicine Name> <Number> mg (<Total Pieces> Pieces)]
-    3. [<Medicine Name> <Number> mg (<Total Pieces> Pieces Continue)]
-    4. [<Medicine Name> <Number> mg (Quantity Not Found)]
+    1. [Medicine Name] [Dosage] mg (**[Total Pieces] Pieces**, [Additional Instruction if any])]
+    2. [Medicine Name] [Dosage] mg (**[Total Pieces] Pieces**)]
+    3. [Medicine Name] [Dosage] mg (**[Total Pieces] Pieces**, Continue)]
+    4. [Medicine Name] [Dosage] mg (**Quantity Not Found**)]
+    
     Tests:
-    1. [<Test Name>]
+    1. [Test Name]
 
-    Guidelines:
-        - Ensure accuracy by carefully checking for discrepancies in spelling or validity.
-        - Perform all calculations directly within the response.
-        - Pay close attention to fractions and dosage frequencies.
-        - Only output the verified information and nothing else.
-        - Please do not give output results in bold and no error message if something is missing return not found.
+**Guidelines:**
+- Ensure accuracy by checking for discrepancies in spelling and validity.
+- Perform all calculations directly within the response.
+- Pay close attention to **fractions, dosage frequencies, and duration conversions**.
+- Do not include any unnecessary information, formatting, or bold text.
+- If any data is missing, return **"Not Found"** instead of error messages.
 `;
+
 app.post("/MediScrape", upload.single("image"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
