@@ -61,11 +61,7 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
     5. Verify Against Medical Databases: Cross-check each extracted name (medicine, test, disease) against a reliable database for accuracy.
     6. Correct Misspellings and Misreads: Identify and correct any errors caused by handwriting issues.
     7. Avoid Fabrication: Do not infer or fabricate any names or information not explicitly visible in the prescription.
-    8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). Ensure the format is <Medicine Name> <Number> mg.
-        - If the dosage value is extracted as a fractional number (e.g., "0.27 mg") or an unusual dosage that is not commonly prescribed, cross-verify the extracted dosage by searching for the <Medicine Name> dosage availability on Google or a medical database. 
-        - If the exact dosage is not found, replace the dosage with the closest valid available dosage (e.g., 25 mg, 50 mg, 100 mg) from the search result.
-        - If no valid dosage is found, return the medicine name without the dosage and indicate "Dosage Not Found".
-        - Ensure this validation process does not fabricate any information or add random values not found in the search.
+    8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). Before finalizing the dosage, cross-check the extracted dosage value against common dosage values available on the internet (Google or standard medical dosage databases). If the dosage is not found or appears invalid (e.g., "0.27 mg"), return the nearest commonly used dosage for that medicine (e.g., 10 mg). If no valid dosage is found, return only the medicine name without the dosage.
     9. Extract all medicine names, their dosages, and the exact quantity as written in the prescription.
     10. Calculate the total number of pieces of each medicine based on dosage instructions. Follow these rules:
         - Convert dosage frequencies into daily totals (e.g., "1+0+1" = 2, "0+0+1/2" = 0.5).
