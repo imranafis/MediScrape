@@ -67,9 +67,10 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
 9. Extract all medicine names, their dosages, and the exact quantity as written in the prescription.  
 10. **Calculate the total number of pieces of each medicine based on the dosage instructions:**  
     - If the dosage includes frequencies like:  
-        - "1+0+1" → **2 pieces per day**  
-        - "0+0+1/2", "০+০+১/২", "0+0+½" → **0.5 pieces per day**  
-        - "1+1+1" → **3 pieces per day**  
+    - "0+0+1/2", "০+০+১/২", "0+0+½" → **0.5 pieces per day**  
+        - "1+0+0", "0+1+0", "0+0+1", "১+০+০", "০+১+০", "০+০+১"  → **1 pieces per day**  
+        - "1+0+1", "১+০+১"  → **2 pieces per day**  
+        - "1+1+1" , "১+১+১" → **3 pieces per day**  
     - **Fractions Handling:**  
         - If a fraction (e.g., "1/2", "১/২", "½") appears in the **dosage**, always treat it as 0.5.  
         - If a fraction appears in the **duration**, ensure it does not interfere with dosage calculation.  
@@ -79,6 +80,7 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
             - "১ সপ্তাহ", "1 week" → **7 days**  
             - "১০ দিন", "10 days" → **10 days**  
         - **Example Calculation:**  
+            - *Formula of Total pieces: Total pieces per day × Duration is given(in days)*
             - "১+১+১" with "১ মাস" → **(1+1+1) × 30 = 90 pieces**  
             - "0+1/2+0" with "১০ দিন" → **(0.5) × 10 = 5 pieces**  
     - **If no duration is mentioned**, assume a default duration of **30 days** and calculate accordingly.  
