@@ -62,20 +62,20 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
 5. Verify Against Medical Databases: Cross-check each extracted name (medicine, test, disease) against a reliable database for accuracy.  
 6. Correct Misspellings and Misreads: Identify and correct any errors caused by handwriting issues.  
 7. Avoid Fabrication: Do not infer or fabricate any names or information not explicitly visible in the prescription.  
-8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg"). 
+8. Extract the medicine dosage information from the given image, focusing specifically on text containing the medicine name followed by a numerical dosage value (e.g., "Indomet 25 mg").
    Ensure the format is '<Medicine Name> <Number> mg'. Validate the dosage for correctness, and if it is invalid, return only the medicine name without the dosage.  
 9. Extract all medicine names, their dosages, and the exact quantity as written in the prescription.  
 10. Calculate the total number of pieces of each medicine based on the dosage instructions:  
     - If the dosage includes frequencies like:  
         - "1+0+1" → 2 pieces per day  
-        - "0+0+1/2" → 0.5 pieces per day  
+        - "0+0+1/2", "0+0+½" → 0.5 pieces per day  
         - "1+1+1" → 3 pieces per day  
-    - If a fraction (e.g., "1/2", "1 by 2") is present, treat it as a decimal (e.g., 0.5).  
+    - If a fraction (e.g., "1/2", "1 by 2", "½") is present in dosage or duration, treat it as 0.5.  
     - If a duration is given (e.g., "১ মাস", "২ সপ্তাহ", "1 month", "2 weeks", "১০ দিন", "10 days"), multiply the daily total by the duration:  
         - ১ মাস = 30 days  
         - ১ সপ্তাহ = 7 days  
         - ১০ দিন = 10 days  
-    - If no duration is mentioned, assume a 1-month (30-day) duration and calculate accordingly.  
+    - If no duration is mentioned, assume a **1-month (30-day) duration** and calculate accordingly.  
     - If the quantity cannot be determined, return "Quantity Not Found".  
 
 11. Output Format: Provide the verified information in the following format, including the calculated total pieces:  
@@ -152,4 +152,4 @@ app.post("/MediScrape", upload.single("image"), async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+app.listen(port, () => console.log(Server running on port ${port}));
