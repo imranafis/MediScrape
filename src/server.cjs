@@ -78,14 +78,14 @@ const promptMsg = `You are an intelligent assistant specializing in extracting i
     - If the quantity cannot be determined, return "Quantity Not Found".
 11. Output Format: Provide the verified information in the following format, including the calculated total pieces:
 
-Doctor: [Doctor's Name]
-Disease: [Disease Name]
+Doctor: <Doctor's Name>
+Disease: <Disease Name>
 Medicines:
-1. [<Medicine Name> <Number> mg (<Total Pieces> Pieces)]
-2. [<Medicine Name> <Number> mg (<Total Pieces> Pieces)]
-3. [<Medicine Name> <Number> mg (Quantity Not Found)]
+1. <Medicine Name> <Number> mg (<Total Pieces> Pieces)
+2. <Medicine Name> <Number> mg (<Total Pieces> Pieces)
+3. <Medicine Name> <Number> mg (Quantity Not Found)
 Tests:
-1. [<Test Name>]
+1. <Test Name>
 
 Guidelines:
 - Prioritize accuracy in dosage calculation. If the information is ambiguous or unclear, return "Quantity Not Found" instead of providing a potentially inaccurate numerical value.
